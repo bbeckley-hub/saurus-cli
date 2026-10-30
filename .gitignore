@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+*.whl
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Environment
+.venv/
+venv/
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# OS
+Thumbs.db
+
+# LibreOffice lock files
+.~lock.*
+
+# Manuscripts (kept out of code history)
+*.docx
+*.doc
+*.pdf
+
+# Generated static site (lives in bbeckley-hub/saurus, not here)
+docs/
+
+# Local Docker test outputs
+docker_test*
+docker_verify*
+
+# Local PyPI upload logs
+/tmp/pypi_upload.log

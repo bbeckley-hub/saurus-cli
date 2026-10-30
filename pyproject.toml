@@ -1,0 +1,87 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "saurus-cli"
+version = "0.1.0"
+description = " 🦖 Command-line interface for querying the SAURUS Staphylococcus aureus genomic surveillance database 🦖 "
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Brown Beckley", email = "brownbeckley94@gmail.com"},
+]
+maintainers = [
+    {name = "Brown Beckley", email = "brownbeckley94@gmail.com"},
+]
+keywords = [
+    "bioinformatics", "genomics", "staphylococcus-aureus", "mrsa",
+    "amr", "antimicrobial-resistance", "surveillance", "genomic-epidemiology",
+    "mlst", "spa", "sccmec", "agr", "capsule", "argus", "eskape",
+    "cli", "reproducible-research",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Healthcare Industry",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+
+dependencies = [
+    "pandas>=1.5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.0",
+    "twine>=5.0",
+    "pytest>=7.0",
+    "ruff>=0.1",
+]
+
+[project.scripts]
+saurus = "saurus_cli:main"
+
+[project.urls]
+Homepage       = "https://saurus-db.org/"
+Documentation  = "https://saurus-db.org/manual.html"
+Repository     = "https://github.com/bbeckley-hub/saurus-cli"
+"Bug Tracker"  = "https://github.com/bbeckley-hub/saurus/issues"
+Changelog      = "https://github.com/bbeckley-hub/saurus-cli/blob/main/CHANGELOG.md"
+Citation       = "https://doi.org/10.1186/s12864-026-12609-x"
+
+[tool.setuptools]
+py-modules = ["saurus_cli"]
+include-package-data = true
+
+# ============================================================
+# BUNDLE THE DATA — installs to <sys.prefix>/share/saurus/data/
+# ============================================================
+[tool.setuptools.data-files]
+"share/saurus/data/agr"              = ["data/agr/*"]
+"share/saurus/data/capsule"          = ["data/capsule/*"]
+"share/saurus/data/gene_annotation"  = ["data/gene_annotation/*"]
+"share/saurus/data/metadata"         = ["data/metadata/*"]
+"share/saurus/data/mlst"             = ["data/mlst/*"]
+"share/saurus/data/mrsa"             = ["data/mrsa/*"]
+"share/saurus/data/sccmec"           = ["data/sccmec/*"]
+"share/saurus/data/spa"              = ["data/spa/*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.md"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"

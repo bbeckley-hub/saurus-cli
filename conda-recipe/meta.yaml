@@ -1,0 +1,63 @@
+{% set name = "saurus-cli" %}
+{% set version = "0.1.0" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  path: ..
+
+build:
+  noarch: python
+  number: 0
+  script: "{{ PYTHON }} -m pip install . -vv"
+  entry_points:
+    - saurus = saurus_cli:main
+
+requirements:
+  host:
+    - python >=3.9
+    - pip
+    - setuptools >=61.0
+    - wheel
+  run:
+    - python >=3.9
+    - pandas >=1.5.0
+
+test:
+  imports:
+    - saurus_cli
+  commands:
+    - saurus --help
+    - saurus --version
+    - saurus --examples
+    - saurus --about
+    # Verify bundled data is present in the install prefix
+    - test -d ${PREFIX}/share/saurus/data/mrsa
+    # End-to-end query using bundled data
+    - saurus --st 5 --count
+
+about:
+  home: https://saurus-db.org/
+  license: MIT
+  license_file: LICENSE
+  summary: 'Command-line interface for the SAURUS Staphylococcus aureus genomic surveillance database'
+  description: |
+    SAURUS-CLI provides programmatic, reproducible access to 134,299
+    Staphylococcus aureus genomes typed by MLST, spa, SCCmec (two independent
+    callers), agr, and capsule serotype, plus AMR genes, virulence factors,
+    plasmid replicons, and BioSample-derived metadata (country, source, host,
+    collection year).
+
+    The full data bundle ships inside the package. After conda install,
+    queries work out of the box with no downloads required.
+
+    SAURUS-CLI is part of the ARGUS initiative, a unified genomic surveillance
+    family covering all six ESKAPE pathogens.
+  doc_url: https://saurus-db.org/manual.html
+  dev_url: https://github.com/bbeckley-hub/saurus-cli
+
+extra:
+  recipe-maintainers:
+    - bbeckley-hub

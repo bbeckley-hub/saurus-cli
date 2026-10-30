@@ -1,0 +1,14 @@
+.git/
+.github/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+scripts/
+*.zip
+*.tsv
+*.csv
+*.json
+!pyproject.toml
+tests/
