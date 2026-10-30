@@ -9,7 +9,7 @@
 [![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs12864--026--12609--x-blue)](https://doi.org/10.1186/s12864-026-12609-x)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-SAURUS-CLI lets you query 139,299 *S. aureus* genomes by MLST, spa, SCCmec, agr, capsule, AMR genes, virulence factors, and epidemiological metadata directly from your terminal. It is designed for reproducible surveillance and seamless integration into bioinformatics pipelines (Nextflow, Snakemake, Bash).
+SAURUS-CLI lets you query 134,299 *S. aureus* genomes by MLST, spa, SCCmec, agr, capsule, AMR genes, virulence factors, and epidemiological metadata directly from your terminal. It is designed for reproducible surveillance and seamless integration into bioinformatics pipelines (Nextflow, Snakemake, Bash).
 
 The full dataset is bundled inside every distribution. After installation, queries run locally with no downloads, no API keys, and no network access.
 
@@ -239,7 +239,7 @@ saurus --st 5 --agr I --capsule 8 --debug --count
 The `--debug` output shows the row count after each filter, so you can see exactly where a query collapsed:
 
 ```
-[debug] Initial load: 139,257 rows
+[debug] Initial load: 134,299 rows
 [debug] --st 5:        14,930 rows
 [debug] --agr I:            0 rows    ← the culprit
 ```
