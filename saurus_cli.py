@@ -113,7 +113,7 @@ LINEAGE_SIGNATURES = {
     "EMRSA-15":   {"st": "22",  "spa": "t032", "sccmec": "IV", "agr": "I",   "capsule": "5"},
     "EMRSA-16":   {"st": "36",  "spa": "t018", "sccmec": "II", "agr": "III", "capsule": "8"},
     "BENGAL BAY": {"st": "772", "spa": "t657", "sccmec": "V",  "agr": "II",  "capsule": "5"},
-    "ST152":      {"st": "152", "spa": "t455"  "sccmec": "V",  "agr": "III", "capsule": "5"},
+    "ST152":      {"st": "152", "spa": "t455", "sccmec": "V",  "agr": "III", "capsule": "5"},
 }
 
 SCIENCE_QUOTES = [
