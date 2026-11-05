@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """
+##
 build_master_tsv.py — Generate a unified master TSV for SAURUS CLI.
 Merges MLST, spa, SCCmec (CGE & RPet), agr, capsule, and metadata.
+##
 """
 
 import pandas as pd
