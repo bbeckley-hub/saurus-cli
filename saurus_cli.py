@@ -8,7 +8,7 @@ Author:      Brown Beckley
 Affiliation: University of Ghana Medical School, Accra, Ghana
 License:     MIT
 
-The full SAURUS dataset (139,299 genomes, 11 modules) ships bundled inside
+The full SAURUS dataset (134K genomes, 11 modules) ships bundled inside
 the pip / conda / Docker distributions. No download required for the base
 case. `saurus init` is provided for users who want to refresh the data
 independently.
@@ -34,7 +34,7 @@ import pandas as pd
 if sys.platform != 'win32' and hasattr(signal, 'SIGPIPE'):
     signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 __author__ = "Brown Beckley"
 __affiliation__ = "University of Ghana Medical School, Accra, Ghana"
 __license__ = "MIT"
@@ -113,7 +113,7 @@ LINEAGE_SIGNATURES = {
     "EMRSA-15":   {"st": "22",  "spa": "t032", "sccmec": "IV", "agr": "I",   "capsule": "5"},
     "EMRSA-16":   {"st": "36",  "spa": "t018", "sccmec": "II", "agr": "III", "capsule": "8"},
     "BENGAL BAY": {"st": "772", "spa": "t657", "sccmec": "V",  "agr": "II",  "capsule": "5"},
-    "ST152":      {"st": "152", "sccmec": "V",                 "agr": "III", "capsule": "5"},
+    "ST152":      {"st": "152", "spa": "t455"  "sccmec": "V",  "agr": "III", "capsule": "5"},
 }
 
 SCIENCE_QUOTES = [
@@ -592,7 +592,7 @@ def main(argv=None):
         sys.exit(cmd_init(argv[1:]))
 
     parser = argparse.ArgumentParser(
-        description="🦖 SAURUS CLI — query 139,299 S. aureus genomes from your terminal. 🦖",
+        description="🦖 SAURUS CLI — query 134K S. aureus genomes from your terminal. 🦖",
         epilog=HELP_EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )

@@ -43,3 +43,6 @@ docker_verify*
 
 # Local PyPI upload logs
 /tmp/pypi_upload.log
+
+*.txt
+*.gz

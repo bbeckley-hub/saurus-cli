@@ -22,7 +22,7 @@ LABEL org.opencontainers.image.title="saurus-cli" \
       org.opencontainers.image.authors="Brown Beckley <brownbeckley94@gmail.com>" \
       org.opencontainers.image.source="https://github.com/bbeckley-hub/saurus-cli" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.version="0.1.0" \
+      org.opencontainers.image.version="0.2.0" \
       org.opencontainers.image.documentation="https://saurus-db.org/manual.html"
 
 # NCBI datasets CLI — so users can download genomes inside the container
