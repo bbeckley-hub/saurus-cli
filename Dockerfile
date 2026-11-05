@@ -25,7 +25,7 @@ LABEL org.opencontainers.image.title="saurus-cli" \
       org.opencontainers.image.version="0.2.0" \
       org.opencontainers.image.documentation="https://saurus-db.org/manual.html"
 
-# NCBI datasets CLI — so users can download genomes inside the container
+## NCBI datasets CLI — so users can download genomes inside the container
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl unzip && \
     curl -fsSL "https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets" \
