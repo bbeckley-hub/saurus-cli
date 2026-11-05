@@ -12,3 +12,6 @@ scripts/
 *.json
 !pyproject.toml
 tests/
+*.docx
+*.txt
+*.gz
