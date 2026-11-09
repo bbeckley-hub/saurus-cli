@@ -6,10 +6,10 @@
 [![PyPI Downloads](https://img.shields.io/pypi/dm/saurus-cli.svg)](https://pypi.org/project/saurus-cli/)
 [![Docker Hub](https://img.shields.io/docker/v/bbeckleyhub/saurus-cli?label=Docker%20Hub&logo=docker)](https://hub.docker.com/r/bbeckleyhub/saurus-cli)
 [![Conda](https://img.shields.io/conda/vn/bioconda/saurus-cli?label=bioconda&logo=anaconda)](https://anaconda.org/bioconda/saurus-cli)
-[![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs12864--026--12609--x-blue)](https://doi.org/10.1186/s12864-026-12609-x)
+[![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs12864--026--12609--x-blue)]( https://doi.org/10.5281/zenodo.24084554)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-SAURUS-CLI lets you query 134,299 *S. aureus* genomes by MLST, spa, SCCmec, agr, capsule, AMR genes, virulence factors, and epidemiological metadata directly from your terminal. It is designed for reproducible surveillance and seamless integration into bioinformatics pipelines (Nextflow, Snakemake, Bash).
+SAURUS-CLI lets you query 134,160 *S. aureus* genomes by MLST, spa, SCCmec, agr, capsule, AMR genes, virulence factors, and epidemiological metadata directly from your terminal. It is designed for reproducible surveillance and seamless integration into bioinformatics pipelines (Nextflow, Snakemake, Bash).
 
 The full dataset is bundled inside every distribution. After installation, queries run locally with no downloads, no API keys, and no network access.
 
@@ -324,6 +324,8 @@ python scripts/build_master_tsv.py
 ## Citation
 
 If you use SAURUS-CLI in your research, please cite:
+
+> Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in *Staphylococcus aureus*. DOI: https://doi.org/10.5281/zenodo.24084554. 2026.
 
 > Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in *Staphylococcus aureus*. *BMC Bioinformatics* [under review]. 2026.
 
