@@ -22,10 +22,10 @@ LABEL org.opencontainers.image.title="saurus-cli" \
       org.opencontainers.image.authors="Brown Beckley <brownbeckley94@gmail.com>" \
       org.opencontainers.image.source="https://github.com/bbeckley-hub/saurus-cli" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.version="0.2.0" \
+      org.opencontainers.image.version="0.3.0" \
       org.opencontainers.image.documentation="https://saurus-db.org/manual.html"
 
-## NCBI datasets CLI — so users can download genomes inside the container
+# NCBI datasets CLI — so users can download genomes inside the container
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl unzip && \
     curl -fsSL "https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets" \
@@ -55,6 +55,15 @@ RUN saurus --lineage USA300 --count --quiet > /tmp/count.txt && \
     rm /tmp/count.txt || \
     (echo "CLI smoke test failed — bundled data is not loadable" && exit 1)
 
+# Entrypoint wrapper: auto-seeds /data from bundled data on first run,
+# then hands off to the CLI. Makes `docker run -v saurus_data:/data image ...`
+# work for persistent `saurus init` updates.
+COPY entrypoint.sh /usr/local/bin/saurus-entrypoint
+RUN chmod +x /usr/local/bin/saurus-entrypoint
+
+# Persistence point for `saurus init` updates
+VOLUME ["/data"]
+
 WORKDIR /work
-ENTRYPOINT ["saurus"]
+ENTRYPOINT ["saurus-entrypoint"]
 CMD ["--version"]

@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "saurus-cli"
-version = "0.2.0"
+version = "0.3.0"
 description = " 🦖 Command-line interface for querying the SAURUS Staphylococcus aureus genomic surveillance database 🦖 "
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Brown Beckley", email = "brownbeckley94@gmail.com"},
 ]
@@ -26,7 +26,7 @@ classifiers = [
     "Environment :: Console",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Healthcare Industry",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: MIT License",  
     "Natural Language :: English",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
@@ -60,16 +60,13 @@ Documentation  = "https://saurus-db.org/manual.html"
 Repository     = "https://github.com/bbeckley-hub/saurus-cli"
 "Bug Tracker"  = "https://github.com/bbeckley-hub/saurus/issues"
 Changelog      = "https://github.com/bbeckley-hub/saurus-cli/blob/main/CHANGELOG.md"
-Citation       = "https://doi.org/10.1186/s12864-026-12609-x"
+Citation       = "Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in Staphylococcus aureus. DOI: https://doi.org/10.5281/zenodo.24084554. 2026."
 
 [tool.setuptools]
 py-modules = ["saurus_cli"]
-include-package-data = true
 
-# ============================================================
-# BUNDLE THE DATA — installs to <sys.prefix>/share/saurus/data/
-# ============================================================
 [tool.setuptools.data-files]
+"share/saurus/data"                  = ["data/DATA_VERSION"]
 "share/saurus/data/agr"              = ["data/agr/*"]
 "share/saurus/data/capsule"          = ["data/capsule/*"]
 "share/saurus/data/gene_annotation"  = ["data/gene_annotation/*"]
@@ -79,9 +76,8 @@ include-package-data = true
 "share/saurus/data/sccmec"           = ["data/sccmec/*"]
 "share/saurus/data/spa"              = ["data/spa/*"]
 
-[tool.setuptools.package-data]
-"*" = ["*.md"]
-
 [tool.ruff]
 line-length = 100
 target-version = "py39"
+
+  
