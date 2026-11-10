@@ -6,18 +6,33 @@
 [![PyPI Downloads](https://img.shields.io/pypi/dm/saurus-cli.svg)](https://pypi.org/project/saurus-cli/)
 [![Docker Hub](https://img.shields.io/docker/v/bbeckleyhub/saurus-cli?label=Docker%20Hub&logo=docker)](https://hub.docker.com/r/bbeckleyhub/saurus-cli)
 [![Conda](https://img.shields.io/conda/vn/bioconda/saurus-cli?label=bioconda&logo=anaconda)](https://anaconda.org/bioconda/saurus-cli)
-[![DOI](https://img.shields.io/badge/DOI-10.1186%2Fs12864--026--12609--x-blue)]( https://doi.org/10.5281/zenodo.24084554)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.24084554-blue)](https://doi.org/10.5281/zenodo.24084554)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-SAURUS-CLI lets you query 134,160 *S. aureus* genomes by MLST, spa, SCCmec, agr, capsule, AMR genes, virulence factors, and epidemiological metadata directly from your terminal. It is designed for reproducible surveillance and seamless integration into bioinformatics pipelines (Nextflow, Snakemake, Bash).
+SAURUS-CLI lets you query 134,160 *S. aureus* genomes by MLST, spa, SCCmec, agr, capsule, AMR genes, virulence factors, and epidemiological metadata directly from your terminal. It exports accessions in four namespaces (assembly, BioSample, SRA run, BioProject) for direct integration with NCBI `datasets` and `fastq-dl`.
 
-The full dataset is bundled inside every distribution. After installation, queries run locally with no downloads, no API keys, and no network access.
+The full dataset ships bundled inside every distribution. After installation, queries run locally with no downloads, no API keys, and no network access.
+
+---
+
+## What's new in v0.3.0
+
+- **SRA raw-read export** via `--format sra`, feeding directly into `fastq-dl` for read-level reanalysis
+- **BioSample and BioProject export** for metadata and study-level provenance
+- **`--has-sra`** filter for the 22,322 genomes with retrievable raw reads
+- **`saurus init` rewritten**: `--from-file <zip>`, `--version <tag>`, `-o <path>`, SHA256 verification, progress bar
+- **`SAURUS_DATA_DIR`** environment variable and XDG data home support for Docker, HPC, pipx, and uv
+- **Docker volume support**: `-v saurus_data:/data` persists data across container restarts
+- **`--version` now reports the data version** alongside the CLI version
+- **Separate code and data versioning**: upgrade the CLI and the data independently
+
+Full changelog: [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
 ## Installation
 
-Choose whichever fits your workflow. All four methods deliver the same CLI and the same bundled data.
+Choose whichever fits your workflow. All methods deliver the same CLI and the same bundled data.
 
 ### pip
 
@@ -50,46 +65,47 @@ docker pull bbeckleyhub/saurus-cli:latest
 docker run --rm bbeckleyhub/saurus-cli:latest --version
 ```
 
-After installation, the `saurus` command is available globally. Verify with:
+Verify the installation:
 
 ```bash
 saurus --version
 saurus --lineage USA300 --count
+# Expected: 10,448
 ```
 
 ---
 
 ## Quick Start
 
-The most common workflow is: **filter → export → download**.
+The most common workflows are **filter → export → download**, for either assemblies or raw reads.
 
-### 1. Filter by lineage
-
-```bash
-# Find all USA300 (ST8, t008, SCCmec IV, agr I) genomes
-saurus --lineage USA300 --count
-```
-
-### 2. Combine genotype and geography
+### Assemblies workflow
 
 ```bash
-# USA300 bloodstream isolates from the United States
+# 1. Filter
 saurus --lineage USA300 --country USA --source blood --count
-```
 
-### 3. Export accessions
-
-```bash
-# Save the matching genome accessions to a text file
+# 2. Export accessions
 saurus --lineage USA300 --country USA --source blood -o usa300_blood.txt
-```
 
-### 4. Download genomes from NCBI
-
-```bash
-# Feed the accession list to NCBI datasets
+# 3. Download from NCBI
 datasets download genome accession --inputfile usa300_blood.txt --filename usa300_blood.zip
 ```
+
+### Raw reads workflow (v0.3.0)
+
+```bash
+# 1. Filter for genomes with retrievable raw reads
+saurus --lineage USA300 --has-sra --count
+
+# 2. Export SRA run accessions
+saurus --lineage USA300 --format sra -o usa300_runs
+
+# 3. Fetch FASTQ files with fastq-dl
+fastq-dl --accession-list usa300_runs_sra_runs.txt
+```
+
+The SRA export handles genomes with multiple runs per BioSample, so the output is a deduplicated list of `SRR`/`ERR`/`DRR` accessions ready for any SRA client.
 
 ---
 
@@ -107,21 +123,42 @@ datasets download genome accession --inputfile usa300_blood.txt --filename usa30
 | `--capsule` | Capsule Serotype | `--capsule 5` or `--capsule 8` |
 | `--mrsa` | Filter only MRSA | `--mrsa` |
 | `--mssa` | Filter only MSSA | `--mssa` |
-| `--country` | Country of origin (searches both `country` and `country_raw`) | `--country USA` |
-| `--source` | Isolation source (searches both `source` and `source_raw`) | `--source blood` |
+| `--has-sra` | Filter only genomes with retrievable SRA raw reads | `--has-sra` |
+| `--country` | Country of origin (searches `country` and `country_raw`) | `--country USA` |
+| `--source` | Isolation source (searches `source` and `source_raw`) | `--source blood` |
 | `--host` | Host species | `--host "Homo sapiens"` |
 | `--year` | Collection year or range | `--year 2019` or `--year 2015-2023` |
 | `--amr` | AMR gene(s), comma-separated | `--amr mecA,tetM` |
-| `--vfdb` | Virulence gene(s), comma-separated | `--vfdb pvl,tst` |
+| `--vfdb` | Virulence gene(s), comma-separated | `--vfdb lukS-PV` |
 | `--plasmid` | Plasmid replicon(s), comma-separated | `--plasmid rep5a` |
 | `--any` | Match ANY gene (default is ALL) | `--amr mecA,tetM --any` |
+
+### Output formats
+
+| Format | Extension | Feeds into |
+|---|---|---|
+| `accession` | `.txt` | NCBI `datasets download genome accession` |
+| `sra` | `_sra_runs.txt` | `fastq-dl --accession-list`, `prefetch` |
+| `biosample` | `_biosamples.txt` | `fastq-dl --group-by-sample`, metadata lookups |
+| `bioproject` | `_bioprojects.txt` | Study-level bulk downloads |
+| `tsv` | `.tsv` | Excel, R, pandas |
+| `csv` | `.csv` | Collaborators, MS Access |
+| `json` | `.json` | Web apps, `jq`, archival |
+
+Request multiple formats in one command:
+
+```bash
+saurus --lineage USA300 --format tsv,accession,sra,biosample -o usa300
+```
+
+This writes four files: `usa300.tsv`, `usa300.txt`, `usa300_sra_runs.txt`, `usa300_biosamples.txt`.
 
 ### Output options
 
 | Flag | Description | Default |
 |---|---|---|
 | `--count` | Print only the number of matching genomes | Off |
-| `--format` | Output format(s): `accession`, `tsv`, `csv`, `json` (comma-separated) | `accession` |
+| `--format` | Output format(s), comma-separated | `accession` |
 | `--output`, `-o` | Output base path (extension added per format) | `stdout` |
 | `--quiet`, `-q` | Suppress banner and footer (useful for scripts) | Off |
 | `--debug` | Show row counts after each filter | Off |
@@ -141,9 +178,63 @@ Use `--lineage` to apply a curated signature without typing every flag.
 | `EMRSA-15` | ST22, t032, SCCmec IV, agr I, capsule 5 |
 | `EMRSA-16` | ST36, t018, SCCmec II, agr III, capsule 8 |
 | `Bengal Bay` | ST772, t657, SCCmec V, agr II, capsule 5 |
-| `ST152` | ST152, SCCmec V, agr III, capsule 5 |
+| `ST152` | ST152, SCCmec V, agr I, capsule 5 |
 
-> **Note:** Any flag you pass alongside `--lineage` overrides the signature. For example, `--lineage USA300 --country Japan` uses the USA300 signature but restricts results to Japan.
+Any flag passed alongside `--lineage` overrides the signature. For example, `--lineage USA300 --country Japan` uses the USA300 signature but restricts results to Japan.
+
+---
+
+## Updating the data
+
+The CLI and the data are versioned independently. The wheel bundles a snapshot of the data at build time. `saurus init` upgrades the data without touching the code.
+
+```bash
+# Install the latest data release
+saurus init
+
+# Pin to a specific data version for reproducibility
+saurus init --version v1.0.0
+
+# Install from a local zip (offline, air-gapped HPC)
+saurus init --from-file saurus_data.zip
+
+# Install to a custom location
+saurus init -o /shared/saurus_data
+
+# Force overwrite existing data
+saurus init --force
+```
+
+`saurus init` verifies the SHA256 checksum of every download and writes a `DATA_VERSION` file. `saurus --version` reports which data release is active:
+
+```
+🦖SAURUS-CLI v0.3.0 — University of Ghana Medical School, Accra, Ghana
+ Data version: v1.0.0  (/home/user/.local/share/saurus)
+```
+
+### Where the data lives
+
+The CLI searches the following locations in priority order (highest wins):
+
+| Priority | Location | Use case |
+|---|---|---|
+| 1 | `--data-dir <path>` | Per-command override |
+| 2 | `$SAURUS_DATA_DIR` | Docker volumes, HPC scratch, shared cluster installs |
+| 3 | `$XDG_DATA_HOME/saurus` (default `~/.local/share/saurus`) | Standard user install |
+| 4 | `~/.saurus/data` | Legacy path (still supported) |
+| 5 | `./data` | Development checkouts |
+| 6 | `sys.prefix/share/saurus/data` | Bundled inside pip/conda/Docker |
+
+To point the CLI at a specific data directory:
+
+```bash
+# Environment variable (Docker, HPC, CI)
+export SAURUS_DATA_DIR=/scratch/saurus
+saurus --lineage USA300 --count
+
+# Per-command flag (highest priority)
+saurus --data-dir /pinned/saurus-v1.0.0 --lineage USA300 --count
+```
 
 ---
 
@@ -171,23 +262,27 @@ Run it with:
 saurus --config usa100_surveillance.json
 ```
 
-The output is two files (`usa100_blood_2020_2025.tsv` and `usa100_blood_2020_2025.txt`). Any command-line flag overrides the corresponding config value, so you can reuse a config file with a one-off change:
+Any command-line flag overrides the corresponding config value, so you can reuse a config file with a one-off change:
 
 ```bash
 saurus --config usa100_surveillance.json --country Japan
+```
+
+For strict reproducibility, pin both the data version and the config file:
+
+```bash
+SAURUS_DATA_DIR=/pinned/saurus-v1.0.0 saurus --config usa100_surveillance.json
 ```
 
 ---
 
 ## Examples Gallery
 
-### Example 1: The classic USA100 query
+### Example 1: USA100 hospital clone
 
 ```bash
 saurus --st 5 --sccmec II --agr II --capsule 5 --spa t002 --source blood --country USA
 ```
-
-Expected result: approximately 297 genomes (blood isolates in the USA).
 
 ### Example 2: USA300 bloodstream infections (2005-2015)
 
@@ -207,22 +302,29 @@ saurus --cc 398 --mrsa --country Denmark --host "Sus scrofa" --count
 saurus --st 8 --vfdb lukS-PV --count
 ```
 
-### Example 5: Multi-drug resistant genomes (mecA + tetM + ermB)
+### Example 5: Multi-drug resistant genomes
 
 ```bash
 saurus --amr mecA,tetM,ermB --any --count
 ```
 
-### Example 6: Multi-format export in one run
+### Example 6: Genomes with raw reads only
+
+```bash
+saurus --lineage EMRSA-15 --has-sra --format sra -o emrsa15_runs
+fastq-dl --accession-list emrsa15_runs_sra_runs.txt
+```
+
+### Example 7: Multi-format export in one run
 
 ```bash
 saurus --lineage USA300 --country USA --source blood \
-    --format tsv,json,accession -o usa300_blood
+    --format tsv,json,accession,sra,biosample -o usa300_blood
 ```
 
-Produces three files: `usa300_blood.tsv`, `usa300_blood.json`, and `usa300_blood.txt`.
+Produces five files, each ready for its downstream tool.
 
-### Example 7: Pipeline integration
+### Example 8: Pipeline integration
 
 ```bash
 # Pipe directly into NCBI datasets (no intermediate file)
@@ -230,7 +332,7 @@ saurus --lineage EMRSA-15 --country "United Kingdom" | \
   datasets download genome accession --inputfile /dev/stdin --filename emrsa15_uk.zip
 ```
 
-### Example 8: Debugging a query that returns zero
+### Example 9: Debugging a query that returns zero
 
 ```bash
 saurus --st 5 --agr I --capsule 8 --debug --count
@@ -239,7 +341,7 @@ saurus --st 5 --agr I --capsule 8 --debug --count
 The `--debug` output shows the row count after each filter, so you can see exactly where a query collapsed:
 
 ```
-[debug] Initial load: 134,299 rows
+[debug] Initial load: 134,160 rows
 [debug] --st 5:        14,930 rows
 [debug] --agr I:            0 rows    ← the culprit
 ```
@@ -248,30 +350,66 @@ Run `saurus --examples` for the full gallery inside your terminal.
 
 ---
 
-## Docker usage
+## Docker Usage
 
-The Docker image bundles the full dataset and the NCBI `datasets` CLI, so you can fetch genomes without installing anything on your host.
+The Docker image bundles the full dataset and the NCBI `datasets` CLI.
 
 ```bash
-# Count genomes
+# Count genomes (zero setup, uses bundled data)
 docker run --rm bbeckleyhub/saurus-cli:latest --lineage USA300 --count
 
 # Export to host directory
 docker run --rm -v "$PWD:/work" bbeckleyhub/saurus-cli:latest \
-    --lineage USA300 --country USA --source blood \
-    --format tsv,accession -o usa300_blood
+    --lineage USA300 --country USA --source blood -o usa300_blood
 ```
+
+### Persistent data with a volume (v0.3.0)
+
+Use a named volume to persist `saurus init` updates across container restarts:
+
+```bash
+# First run: entrypoint seeds /data from the bundled dataset
+docker run --rm -v saurus_data:/data bbeckleyhub/saurus-cli:latest --lineage USA300 --count
+
+# Update the data in the same volume
+docker run --rm -v saurus_data:/data bbeckleyhub/saurus-cli:latest init --force
+
+# Subsequent runs use the updated data
+docker run --rm -v saurus_data:/data bbeckleyhub/saurus-cli:latest --version
+```
+
+The entrypoint automatically sets `SAURUS_DATA_DIR=/data` when a volume is mounted, so all queries and updates use the persistent location.
 
 Full Docker Hub README: https://hub.docker.com/r/bbeckleyhub/saurus-cli
 
 ---
 
-## Data requirements
+## HPC Deployment
 
-If you clone the repository and install in editable mode, SAURUS-CLI expects a `data/` directory with the following structure. All files are gzip-compressed (`*.tsv.gz`) in the distributed package, and the CLI reads both compressed and uncompressed files transparently.
+For clusters where users share a read-only data directory, install once and export the path:
+
+```bash
+# Admin: install to shared scratch (once)
+sudo mkdir -p /scratch/saurus
+SAURUS_DATA_DIR=/scratch/saurus saurus init
+sudo chmod -R a+r /scratch/saurus
+
+# Users: point at the shared copy
+export SAURUS_DATA_DIR=/scratch/saurus
+saurus --lineage USA300 --count
+```
+
+Zero duplication. If the admin updates the shared copy, all users pick up the change on the next query.
+
+---
+
+## Data Requirements (Development)
+
+If you clone the repository and install in editable mode (`pip install -e .`), the CLI reads from `./data/`. The distributed package bundles this directory under `share/saurus/data/`.
 
 ```
 data/
+├── DATA_VERSION                 # Release tag (e.g., v1.0.0)
 ├── mrsa/
 │   └── mrsa_all.tsv.gz          # Master TSV (all typing + metadata)
 ├── mlst/
@@ -294,30 +432,30 @@ data/
     └── plasmid_all.tsv.gz
 ```
 
-The CLI searches four locations in priority order:
-
-1. An explicit `--data-dir` argument
-2. `~/.saurus/data/` (populated by `saurus init`)
-3. `./data/` (for source checkouts)
-4. `<sys.prefix>/share/saurus/data/` (the bundled install location)
-
 To regenerate the master TSV from individual modules:
 
 ```bash
 python scripts/build_master_tsv.py
 ```
 
+To build a release-ready data bundle for `saurus init`:
+
+```bash
+bash scripts/package_data.sh v1.0.0
+```
+
 ---
 
-## Built-in commands
+## Built-in Commands
 
 | Command | Purpose |
 |---|---|
 | `saurus --examples` | Full gallery of example queries |
 | `saurus --about` | Author, affiliation, citations, and links |
-| `saurus --version` | Version number |
+| `saurus --version` | CLI version and data version |
 | `saurus --help` | Full flag reference |
-| `saurus init` | Refresh the data bundle (optional; data is bundled) |
+| `saurus init` | Install or refresh the data bundle |
+| `saurus init --help` | Options for data installation |
 
 ---
 
@@ -325,9 +463,7 @@ python scripts/build_master_tsv.py
 
 If you use SAURUS-CLI in your research, please cite:
 
-> Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in *Staphylococcus aureus*. DOI: https://doi.org/10.5281/zenodo.24084554. 2026.
-
-> Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in *Staphylococcus aureus*. *BMC Bioinformatics* [under review]. 2026.
+> Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in *Staphylococcus aureus*. Zenodo. 2026. doi:10.5281/zenodo.24084554
 
 The underlying typing pipeline:
 
