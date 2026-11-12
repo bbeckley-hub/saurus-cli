@@ -15,6 +15,18 @@ The full dataset ships bundled inside every distribution. After installation, qu
 
 ---
 
+## Three ways to access SAURUS
+
+| Resource | Package | When to use |
+|---|---|---|
+| [saurus-db.org](https://saurus-db.org/) | Web interface | Interactive exploration, one-off queries, verifying a lineage |
+| **SAURUS-CLI** (this package) | `pip install saurus-cli` | Repeated queries, scripted pipelines, offline work, pinned data versions |
+| [saurus-fsspec](https://github.com/bbeckley-hub/saurus-fsspec) | `pip install saurus-fsspec` | One-off pandas analyses, CI runs, streaming from remote without the 15 MB bundle |
+
+All three read the same data and return the same numbers. Pick the tool that matches your workflow.
+
+---
+
 ## What's new in v0.3.0
 
 - **SRA raw-read export** via `--format sra`, feeding directly into `fastq-dl` for read-level reanalysis
@@ -39,6 +51,8 @@ Choose whichever fits your workflow. All methods deliver the same CLI and the sa
 ```bash
 pip install saurus-cli
 ```
+
+> Need SAURUS data in pandas without the 15 MB bundle? See [saurus-fsspec](https://github.com/bbeckley-hub/saurus-fsspec), which registers a `saurus://` fsspec protocol so `pd.read_csv("saurus://master", sep="\t")` streams the table directly from saurus-db.org.
 
 ### uv (fastest)
 
@@ -178,7 +192,7 @@ Use `--lineage` to apply a curated signature without typing every flag.
 | `EMRSA-15` | ST22, t032, SCCmec IV, agr I, capsule 5 |
 | `EMRSA-16` | ST36, t018, SCCmec II, agr III, capsule 8 |
 | `Bengal Bay` | ST772, t657, SCCmec V, agr II, capsule 5 |
-| `ST152` | ST152, SCCmec V, agr I, capsule 5 |
+| `ST152` | ST152, t355, SCCmec V, agr I, capsule 5 |
 
 Any flag passed alongside `--lineage` overrides the signature. For example, `--lineage USA300 --country Japan` uses the USA300 signature but restricts results to Japan.
 
@@ -341,10 +355,13 @@ saurus --st 5 --agr I --capsule 8 --debug --count
 The `--debug` output shows the row count after each filter, so you can see exactly where a query collapsed:
 
 ```
-[debug] Initial load: 134,160 rows
-[debug] --st 5:        14,930 rows
-[debug] --agr I:            0 rows    ← the culprit
+[debug] Initial load: 134,273 rows
+[debug] --st 5: 17,773 rows
+[debug] --agr I: 5 rows
+[debug] --capsule Type 8: 0 rows    ← the culprit
 ```
+
+The `--capsule` line identifies the mismatch: the USA100 clone (ST5) is canonically agr II with capsule 5, so no ST5 genome is agr I with capsule 8.
 
 Run `saurus --examples` for the full gallery inside your terminal.
 
@@ -482,6 +499,7 @@ SAURUS-CLI is the second release in the ARGUS initiative, a family of open genom
 - ARGUS umbrella: https://argus-db.org/
 - SAURUS web resource: https://saurus-db.org/
 - Full CLI manual: https://saurus-db.org/manual.html
+- Pandas access via fsspec: https://github.com/bbeckley-hub/saurus-fsspec
 
 ---
 
