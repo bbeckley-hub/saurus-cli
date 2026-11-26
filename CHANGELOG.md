@@ -6,6 +6,72 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-11-26
+
+Paired with data release `saurus-data-v1.1.0`
+([github.com/bbeckley-hub/argus-data](https://github.com/bbeckley-hub/argus-data)),
+which repairs the truncated virulence table shipped in data v1.0.0
+(Excel 1,048,575-row cap; the VFDB table has 1,136,551 annotation rows and
+98,948 annotated genomes, up from 13,978).
+
+### Added
+- **Data releases resolved from the standalone `argus-data` repository** —
+  `saurus init` resolves the newest `saurus-data-*` tag, verifies the
+  `.sha256` sidecar, and installs; releases are namespaced by tag prefix so
+  the other ARGUS CLIs share the same repository without interference
+- **`saurus init -v <tag>` verified remotely** — pinned downloads (e.g.
+  `-v v1.1.0`) now resolve against the argus-data release assets (previously
+  a 404, since data was attached to the code release)
+- **Checksum enforcement for offline installs** — `init --from-file` refuses
+  to install when the `.sha256` sidecar is missing or fails; the explicit
+  `--allow-unverified` flag is the only way to install unverified, and a
+  checksum mismatch remains fatal in all cases
+- **Validation harnesses** — `smoke_test_v040.sh` (55 checks), a Table 3
+  checker, and `r2_regression_test.sh`, which re-runs every test performed
+  during external review of v0.3.0 against the corrected release pair
+- **Test suite** — 63 pytest tests: 27 regression tests on a synthetic
+  fixture bundle plus 36 release-gate tests pinned to the published v1.1.0
+  bundle (golden counts and data-content pins)
+- **Docker in-image gate** — the build now pins the bundled-data smoke test
+  to the expected count (`--lineage USA300` = 10,448), so a wheel carrying
+  stale data fails the build instead of shipping
+
+### Fixed
+- **Unknown gene in `--any` mode returned the entire collection (134,273)** —
+  now aborts with exit code 1 and a diagnostic in both `--any` and ALL modes
+- **`--cc` matched nothing for valid clonal complexes** (e.g. `--cc 8 --mrsa`
+  returned 0) — CC mapping repaired; `--cc 8 --mrsa` = 24,161
+- **`--country` used substring matching** (Oman matched Romania, India
+  matched Indiana) — now exact or explicit-prefix semantics
+- **`tet(M)` returned 0 rows** — allele-name normalisation makes `tetM` and
+  `tet(M)` interchangeable; no regex needed
+- **`lineage` key in `--config` was silently ignored** — honoured now; CLI
+  flags still override config values
+- **Unknown config keys were silently ignored** — now fatal (exit 1)
+- **Numeric `--year` values crashed the filter** — handled
+- **`saurus init -v <tag>` returned HTTP 404** — data assets moved from the
+  code release to the argus-data release repository
+
+### Changed
+- **Data release URL** — `saurus init` now downloads from
+  `github.com/bbeckley-hub/argus-data` releases (tag prefix `saurus-data-`)
+  instead of code-release assets
+- **`init --help`** documents the new checksum-enforcement behaviour
+- **Toolchain recorded** for the v1.1.0 typing layer: StaphScope v2.0.0–
+  v2.1.0 (mlst 2.35.2, Ridom spaTyper, SCCmecFinder 1.2.0, RPet, agrVATE,
+  ABRicate 1.4.0)
+
+### Verified
+- 24-query differential validation against an independent pandas
+  re-implementation (24/24 agreement)
+- 63-test pytest suite pinned to the released bundle
+- 55-check smoke harness; all ten lineage shortcuts, seven export formats,
+  config≡CLI equivalence, and error paths
+- Docker build gate: wheel data count ≥ 16, bundled-data smoke = 10,448,
+  `--version` reports CLI v0.4.0 + data v1.1.0
+- Remote install verified: `saurus init -v v1.1.0` downloads 16.3 MB from
+  the argus-data release, checksum verified, 16 files / 16.5 MB
+
 ## [0.3.0] — 2026-11-10
 
 ### Added
@@ -135,7 +201,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - JSON config file support (`--config`)
 - Accession-first export model
 
-[Unreleased]: https://github.com/bbeckley-hub/saurus-cli/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/bbeckley-hub/saurus-cli/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/bbeckley-hub/saurus-cli/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/bbeckley-hub/saurus-cli/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/bbeckley-hub/saurus-cli/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/bbeckley-hub/saurus-cli/compare/v0.0.0...v0.1.0
