@@ -11,7 +11,6 @@
 #   SAURUS_CLI="saurus" bash smoke_test_v040.sh     # test the installed CLI
 #
 # Full results (including every recorded count) are written to smoke_results.txt
-# — paste that file back for the paper's Table 3 / reviewer evidence.
 # ---------------------------------------------------------------------------
 set -u
 
