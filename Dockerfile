@@ -8,9 +8,20 @@ FROM python:3.12-slim AS builder
 WORKDIR /build
 COPY pyproject.toml MANIFEST.in LICENSE README.md saurus_cli.py ./
 COPY data ./data
-RUN pip install --no-cache-dir build && \
-    python -m build --wheel
 
+RUN test -f data/mrsa/mrsa_all.tsv.gz && \
+    test -f data/DATA_VERSION || \
+    (echo "ERROR: data files missing from build context. Check .dockerignore." && \
+     ls -la data/ && exit 1)
+
+RUN pip install --no-cache-dir build && \
+    python -m build --wheel && \
+    python -c "import glob, zipfile, sys; \
+w = glob.glob('dist/*.whl')[0]; \
+f = zipfile.ZipFile(w); \
+n = sum(1 for x in f.namelist() if 'share/saurus/data' in x); \
+print(f'Data files in wheel: {n}'); \
+sys.exit(0 if n >= 16 else 1)"
 
 # ============================================================
 # Stage 2 — runtime
@@ -22,10 +33,9 @@ LABEL org.opencontainers.image.title="saurus-cli" \
       org.opencontainers.image.authors="Brown Beckley <brownbeckley94@gmail.com>" \
       org.opencontainers.image.source="https://github.com/bbeckley-hub/saurus-cli" \
       org.opencontainers.image.licenses="MIT" \
-      org.opencontainers.image.version="0.3.0" \
+      org.opencontainers.image.version="0.4.0" \
       org.opencontainers.image.documentation="https://saurus-db.org/manual.html"
 
-# NCBI datasets CLI — so users can download genomes inside the container
 RUN apt-get update && \
     apt-get install -y --no-install-recommends ca-certificates curl unzip && \
     curl -fsSL "https://ftp.ncbi.nlm.nih.gov/pub/datasets/command-line/v2/linux-amd64/datasets" \
@@ -33,11 +43,11 @@ RUN apt-get update && \
     chmod +x /usr/local/bin/datasets && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install saurus-cli wheel (data ships inside → installs to /usr/local/share/saurus/data/)
 COPY --from=builder /build/dist/*.whl /tmp/
-RUN pip install --no-cache-dir /tmp/*.whl && rm -f /tmp/*.whl
+RUN ls -lh /tmp/*.whl && \
+    unzip -l /tmp/*.whl | grep -c "share/saurus/data" && \
+    pip install --no-cache-dir /tmp/*.whl && rm -f /tmp/*.whl
 
-# Sanity check: verify the full data bundle is present (not just the mrsa folder)
 RUN test -d /usr/local/share/saurus/data/mrsa && \
     test -d /usr/local/share/saurus/data/mlst && \
     test -d /usr/local/share/saurus/data/spa && \
@@ -48,21 +58,14 @@ RUN test -d /usr/local/share/saurus/data/mrsa && \
     test -d /usr/local/share/saurus/data/metadata || \
     (echo "Data bundle incomplete — check pyproject.toml data-files entries" && exit 1)
 
-# Smoke test: verify the CLI can actually load the bundled data and count genomes
 RUN saurus --lineage USA300 --count --quiet > /tmp/count.txt && \
     test -s /tmp/count.txt && \
-    grep -qE '^[0-9,]+$' /tmp/count.txt && \
-    rm /tmp/count.txt || \
-    (echo "CLI smoke test failed — bundled data is not loadable" && exit 1)
+    test "$(cat /tmp/count.txt)" = "10,448" || \
+    (echo "CLI smoke test failed: got '$(cat /tmp/count.txt)', expected 10,448 (data v1.1.0)" && exit 1) && \
+    rm -f /tmp/count.txt
 
-# Entrypoint wrapper: auto-seeds /data from bundled data on first run,
-# then hands off to the CLI. Makes `docker run -v saurus_data:/data image ...`
-# work for persistent `saurus init` updates.
 COPY entrypoint.sh /usr/local/bin/saurus-entrypoint
 RUN chmod +x /usr/local/bin/saurus-entrypoint
-
-# Persistence point for `saurus init` updates
-VOLUME ["/data"]
 
 WORKDIR /work
 ENTRYPOINT ["saurus-entrypoint"]

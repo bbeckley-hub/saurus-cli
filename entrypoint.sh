@@ -1,40 +1,33 @@
 #!/bin/sh
-# saurus-entrypoint — seed /data volume from bundled data on first run,
-# then hand off to the CLI.
-#
-# Behaviour:
-#   - No /data mount       → use bundled data at /usr/local/share/saurus/data
-#   - /data mount, empty   → seed from bundled data, use /data
-#   - /data mount, has data → use /data (persists `saurus init` updates)
-#
-# Handles argument forms:
-#   image                              → saurus --version
-#   image --lineage USA300 --count     → saurus --lineage USA300 --count
-#   image saurus --lineage USA300      → saurus --lineage USA300
-#   image init                         → saurus init
-#   image bash                         → bash
-
+# saurus-entrypoint — seed /data from bundled data on first run.
 set -e
 
-# --- Seed /data if mounted and empty ---
+# If /data is mounted, point the CLI at it
 if [ -d /data ]; then
-    if [ -z "$(ls -A /data 2>/dev/null)" ]; then
-        echo "[saurus-entrypoint] Seeding /data from bundled data..." >&2
-        cp -r /usr/local/share/saurus/data/. /data/ 2>/dev/null || true
-    fi
-    # Point the CLI at /data if it contains anything
-    if [ -d /data/mrsa ] || [ -f /data/mrsa_all.tsv ] || [ -f /data/mrsa_all.tsv.gz ]; then
-        export SAURUS_DATA_DIR=/data
-        echo "[saurus-entrypoint] Using data at /data" >&2
-    fi
+    export SAURUS_DATA_DIR=/data
 fi
 
-# --- Default to --version if no args ---
+# Skip seeding when running init (user is explicitly installing data)
+skip_seed=0
+case "$1" in
+    init|setup) skip_seed=1 ;;
+    saurus)
+        case "$2" in
+            init|setup) skip_seed=1 ;;
+        esac
+        ;;
+esac
+
+# Seed /data only if mounted, empty, and not running init
+if [ -d /data ] && [ "$skip_seed" = "0" ] && [ -z "$(ls -A /data 2>/dev/null)" ]; then
+    echo "[saurus-entrypoint] Seeding /data from bundled data..." >&2
+    cp -r /usr/local/share/saurus/data/. /data/ 2>/dev/null || true
+fi
+
 if [ "$#" -eq 0 ]; then
     set -- --version
 fi
 
-# --- Prepend "saurus" for flag-style and known subcommands ---
 case "$1" in
     --*|init|setup)
         exec saurus "$@"

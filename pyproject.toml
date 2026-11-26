@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "saurus-cli"
-version = "0.3.0"
+version = "0.4.0"
 description = " 🦖 Command-line interface for querying the SAURUS Staphylococcus aureus genomic surveillance database 🦖 "
 readme = {file = "README.md", content-type = "text/markdown"}
 requires-python = ">=3.9"
@@ -26,7 +26,6 @@ classifiers = [
     "Environment :: Console",
     "Intended Audience :: Science/Research",
     "Intended Audience :: Healthcare Industry",
-    "License :: OSI Approved :: MIT License",  
     "Natural Language :: English",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
@@ -60,24 +59,35 @@ Documentation  = "https://saurus-db.org/manual.html"
 Repository     = "https://github.com/bbeckley-hub/saurus-cli"
 "Bug Tracker"  = "https://github.com/bbeckley-hub/saurus/issues"
 Changelog      = "https://github.com/bbeckley-hub/saurus-cli/blob/main/CHANGELOG.md"
-Citation       = "Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in Staphylococcus aureus. DOI: https://doi.org/10.5281/zenodo.24084554. 2026."
+Citation       = "https://doi.org/10.5281/zenodo.24084554"
 
 [tool.setuptools]
 py-modules = ["saurus_cli"]
 
 [tool.setuptools.data-files]
 "share/saurus/data"                  = ["data/DATA_VERSION"]
-"share/saurus/data/agr"              = ["data/agr/*"]
-"share/saurus/data/capsule"          = ["data/capsule/*"]
-"share/saurus/data/gene_annotation"  = ["data/gene_annotation/*"]
-"share/saurus/data/metadata"         = ["data/metadata/*"]
-"share/saurus/data/mlst"             = ["data/mlst/*"]
-"share/saurus/data/mrsa"             = ["data/mrsa/*"]
-"share/saurus/data/sccmec"           = ["data/sccmec/*"]
-"share/saurus/data/spa"              = ["data/spa/*"]
+"share/saurus/data/agr"              = ["data/agr/agr_all.tsv.gz"]
+"share/saurus/data/capsule"          = ["data/capsule/capsule_all.tsv.gz"]
+"share/saurus/data/gene_annotation"  = [
+    "data/gene_annotation/amr_all.tsv.gz",
+    "data/gene_annotation/amr_gene_freq.tsv.gz",
+    "data/gene_annotation/plasmid_all.tsv.gz",
+    "data/gene_annotation/plasmid_gene_freq.tsv.gz",
+    "data/gene_annotation/vfdb_all.tsv.gz",
+    "data/gene_annotation/vfdb_gene_freq.tsv.gz",
+]
+"share/saurus/data/metadata"         = ["data/metadata/metadata.tsv.gz"]
+"share/saurus/data/mlst"             = [
+    "data/mlst/cc.txt.gz",
+    "data/mlst/mlst_all.tsv.gz",
+]
+"share/saurus/data/mrsa"             = ["data/mrsa/mrsa_all.tsv.gz"]
+"share/saurus/data/sccmec"           = [
+    "data/sccmec/sccmec_cge_all.tsv.gz",
+    "data/sccmec/sccmec_rpet_all.tsv.gz",
+]
+"share/saurus/data/spa"              = ["data/spa/spa_all.tsv.gz"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py39"
-
-  
