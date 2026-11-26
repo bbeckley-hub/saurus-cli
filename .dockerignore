@@ -1,17 +1,30 @@
+# Version control
 .git/
 .github/
+
+# Python build artifacts and caches
 __pycache__/
 *.py[cod]
 *.egg-info/
 build/
 dist/
+.pytest_cache/
+.ruff_cache/
+
+# Development-only directories
 scripts/
-*.zip
-*.tsv
-*.csv
-*.json
-!pyproject.toml
+test/
 tests/
+conda-recipe/
+docs/
+manuscript_data/
+
+# Development-only files
+CHANGELOG.md
 *.docx
-*.txt
-*.gz
+
+# Root-level junk from local testing
+/gz.txt
+/gz.txt.gz
+
+

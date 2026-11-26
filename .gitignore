@@ -46,3 +46,10 @@ docker_verify*
 
 *.txt
 *.gz
+manuscript_data/
+provenance_fillins.sh
+saurus_cli.py.bak2
+verify_manuscript.sh
+
+# Data bundles ship via argus-data releases, not git
+data/
