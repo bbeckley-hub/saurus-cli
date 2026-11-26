@@ -53,3 +53,6 @@ verify_manuscript.sh
 
 # Data bundles ship via argus-data releases, not git
 data/
+
+# Data bundles ship via argus-data releases, not git
+data/
