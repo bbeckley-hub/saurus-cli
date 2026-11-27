@@ -448,6 +448,12 @@ Zero duplication. If the admin updates the shared copy, all users pick up the ch
 
 If you clone the repository and install in editable mode (`pip install -e .`), the CLI reads from `./data/`. The distributed package bundles this directory under `share/saurus/data/`. The versioned data bundle itself is published in the [argus-data](https://github.com/bbeckley-hub/argus-data) repository, not in this code repository.
 
+>The versioned data bundle itself is published in the argus-data repository, not in this code repository.
+
+The pipeline that produced every table behind the web resource — the HPC typing lane, batch checkpoints, merge and curation scripts, and all sitegenerators — is maintained in the
+[argus-code](https://github.com/bbeckley-hub/argus-code) repository(subdirectory `saurus/`). It ships the full checkpoint state gzipped: restore with `scripts/restore_seeds.sh`, then `Regenerate_all.sh` reproduces the live site; new genomes enter 
+through the documented HPC lane into `batches/`. See `saurus/README.md` for the two-lane workflow and the verified checkpoint numbers. The gene-annotation layer derives from the static Shelenkov et al. (2025) tables and is never regenerated.
+
 ```
 data/
 ├── DATA_VERSION                 # Release tag (e.g., v1.1.0)
@@ -550,6 +556,7 @@ SAURUS-CLI is the second release in the ARGUS initiative, a family of open genom
 - Full CLI manual: https://saurus-db.org/manual.html
 - Data releases: https://github.com/bbeckley-hub/argus-data (tag prefix `saurus-data-`)
 - Pandas access via fsspec: https://github.com/bbeckley-hub/saurus-fsspec
+- Web & data pipeline source (full reproducibility): https://github.com/bbeckley-hub/argus-code (`saurus/` — HPC lane, batch checkpoints, site generators)
 
 ---
 
