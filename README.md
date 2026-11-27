@@ -1,3 +1,4 @@
+
 # SAURUS-CLI
 
 **Command-line access to the SAURUS *Staphylococcus aureus* genomic surveillance database.**
@@ -6,13 +7,13 @@
 [![PyPI Downloads](https://img.shields.io/pypi/dm/saurus-cli.svg)](https://pypi.org/project/saurus-cli/)
 [![Docker Hub](https://img.shields.io/docker/v/bbeckleyhub/saurus-cli?label=Docker%20Hub&logo=docker)](https://hub.docker.com/r/bbeckleyhub/saurus-cli)
 [![Conda](https://img.shields.io/conda/vn/bioconda/saurus-cli?label=bioconda&logo=anaconda)](https://anaconda.org/bioconda/saurus-cli)
-[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.24084554-blue)](https://doi.org/10.5281/zenodo.24084554)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.24084553-blue)](https://doi.org/10.5281/zenodo.24084553)
 [![Data DOI](https://img.shields.io/badge/Data%20DOI-10.5281%2Fzenodo.24568725-blue)](https://doi.org/10.5281/zenodo.24568725)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 SAURUS-CLI lets you query a master table of 134,273 *S. aureus* genomes (134,160 typed genomes plus 113 metadata-only BioSample records) by MLST, spa, SCCmec, agr, capsule, AMR genes, virulence factors, plasmid replicons, and epidemiological metadata directly from your terminal. It exports accessions in four namespaces (assembly, BioSample, SRA run, BioProject) for direct integration with NCBI `datasets` and `fastq-dl`.
 
-The full dataset ships bundled inside every distribution (data release v1.1.0; 16 files, 16.5 MB). After installation, queries run locally with no downloads, no API keys, and no network access.
+The full dataset ships bundled inside every distribution (data release v1.1.0; 16 files, 17 MB (16.3 MiB)). After installation, queries run locally with no downloads, no API keys, and no network access.
 
 ---
 
@@ -22,7 +23,7 @@ The full dataset ships bundled inside every distribution (data release v1.1.0; 1
 |---|---|---|
 | [saurus-db.org](https://saurus-db.org/) | Web interface | Interactive exploration, one-off queries, verifying a lineage |
 | **SAURUS-CLI** (this package) | `pip install saurus-cli` | Repeated queries, scripted pipelines, offline work, pinned data versions |
-| [saurus-fsspec](https://github.com/bbeckley-hub/saurus-fsspec) | `pip install saurus-fsspec` | One-off pandas analyses, CI runs, streaming from remote without the 16.5 MB bundle |
+| [saurus-fsspec](https://github.com/bbeckley-hub/saurus-fsspec) | `pip install saurus-fsspec` | One-off pandas analyses, CI runs, streaming from remote without the 17 MB bundle |
 
 All three read the same data and return the same numbers. Pick the tool that matches your workflow.
 
@@ -30,12 +31,12 @@ All three read the same data and return the same numbers. Pick the tool that mat
 
 ## What's new in v0.4.0
 
-- **Corrected data release v1.1.0** — repairs the truncated virulence table shipped in data v1.0.0 (an Excel row-cap defect): the VFDB layer now covers 1,136,551 annotation rows over 98,948 annotated genomes (was 13,978). Gene-query results change accordingly: `--vfdb lukS-PV` returns 14,856 master-table genomes (was 558)
+- **Corrected data release v1.1.0** — repairs the truncated virulence table shipped in data v1.0.0 (an Excel row-cap defect): the VFDB layer now covers 1,136,550 annotation rows over 98,948 annotated genomes (was 13,978). Gene-query results change accordingly: `--vfdb lukS-PV` returns 14,856 master-table genomes (was 558)
 - **Data releases resolved from the standalone [argus-data](https://github.com/bbeckley-hub/argus-data) repository** — `saurus init` resolves the newest `saurus-data-*` tag, so code and data versioning are fully decoupled; `saurus init -v v1.1.0` pins a specific release
 - **Checksum enforcement for offline installs** — `saurus init --from-file` now refuses to install when the `.sha256` sidecar is missing or fails; `--allow-unverified` is the explicit opt-out, and a checksum mismatch is always fatal
 - **Loud failures instead of silent wrong answers** — an unknown gene under `--any` aborts with exit code 1 (was: returned all 134,273 rows); unknown config keys are fatal; `--country` uses exact matching (Oman no longer matches Romania)
 - **`--cc` repaired** — the clonal-complex column is recomputed from the MLST CC map at load time; `--cc 8 --mrsa` returns 24,161 (was 0), and exclusions of unmapped genomes are reported
-- **63-test automated suite** pinned to the released bundle, a 55-check smoke harness, and a 57-check regression harness that re-runs every external-review test
+- **63-test automated suite** pinned to the released bundle, a 55-check smoke harness, and a regression harness that re-runs every external-review test
 - **Docker build gate** — the image build asserts the bundled-data smoke count (`--lineage USA300` = 10,448), so a wheel carrying stale data fails the build
 
 Full changelog: [CHANGELOG.md](CHANGELOG.md)
@@ -52,7 +53,7 @@ Choose whichever fits your workflow. All methods deliver the same CLI and the sa
 pip install saurus-cli
 ```
 
-> Need SAURUS data in pandas without the 16.5 MB bundle? See [saurus-fsspec](https://github.com/bbeckley-hub/saurus-fsspec), which registers a `saurus://` fsspec protocol so `pd.read_csv("saurus://master", sep="\t")` streams the table directly from saurus-db.org.
+> Need SAURUS data in pandas without the 17 MB bundle? See [saurus-fsspec](https://github.com/bbeckley-hub/saurus-fsspec), which registers a `saurus://` fsspec protocol so `pd.read_csv("saurus://master", sep="\t")` streams the table directly from saurus-db.org.
 
 ### uv (fastest)
 
@@ -150,7 +151,7 @@ The SRA export handles genomes with multiple runs per BioSample, so the output i
 | `--plasmid` | Plasmid replicon(s), comma-separated | `--plasmid rep21` |
 | `--any` | Match ANY gene (default is ALL) | `--amr mecA,tetM --any` |
 
-Gene names are matched on anchored, punctuation-insensitive base names: `tet(M)` and `tetM` are interchangeable, and `mecA` resolves to the numbered alleles `mecA1`–`mecA9`. An unknown gene is fatal (exit code 1) in both ALL and `--any` modes.
+Gene names are matched on anchored, punctuation-insensitive base names: `tet(M)` and `tetM` are interchangeable, and `mecA` resolves to the numbered alleles `mecA_1`, `mecA_2`, `mecA_6`, `mecA_8`, and `mecA_9`. An unknown gene is fatal (exit code 1) in both ALL and `--any` modes.
 
 ### Gene-query denominators
 
@@ -185,6 +186,8 @@ This writes four files: `usa300.tsv`, `usa300.txt`, `usa300_sra_runs.txt`, `usa3
 | `--output`, `-o` | Output base path (extension added per format) | `stdout` |
 | `--quiet`, `-q` | Suppress banner and footer (useful for scripts) | Off |
 | `--debug` | Show row counts after each filter | Off |
+
+---
 
 ### Pre-defined lineage signatures
 
@@ -448,11 +451,7 @@ Zero duplication. If the admin updates the shared copy, all users pick up the ch
 
 If you clone the repository and install in editable mode (`pip install -e .`), the CLI reads from `./data/`. The distributed package bundles this directory under `share/saurus/data/`. The versioned data bundle itself is published in the [argus-data](https://github.com/bbeckley-hub/argus-data) repository, not in this code repository.
 
->The versioned data bundle itself is published in the argus-data repository, not in this code repository.
-
-The pipeline that produced every table behind the web resource — the HPC typing lane, batch checkpoints, merge and curation scripts, and all sitegenerators — is maintained in the
-[argus-code](https://github.com/bbeckley-hub/argus-code) repository(subdirectory `saurus/`). It ships the full checkpoint state gzipped: restore with `scripts/restore_seeds.sh`, then `Regenerate_all.sh` reproduces the live site; new genomes enter 
-through the documented HPC lane into `batches/`. See `saurus/README.md` for the two-lane workflow and the verified checkpoint numbers. The gene-annotation layer derives from the static Shelenkov et al. (2025) tables and is never regenerated.
+The pipeline that produced every table behind the web resource — the HPC typing lane, batch checkpoints, merge and curation scripts, and all site generators — is maintained in the [argus-code](https://github.com/bbeckley-hub/argus-code) repository (subdirectory `saurus/`). It ships the full checkpoint state gzipped: restore with `scripts/restore_seeds.sh`, then `Regenerate_all.sh` reproduces the live site; new genomes enter through the documented HPC lane into `batches/`. See `saurus/README.md` for the two-lane workflow and the verified checkpoint numbers. The gene-annotation layer derives from the static Shelenkov et al. (2025) tables and is never regenerated.
 
 ```
 data/
@@ -507,7 +506,7 @@ bash scripts/package_data.sh v1.1.0
 ```bash
 SAURUS_DATA_DIR="$HOME/.saurus/data" python3 -m pytest tests/ -q   # 63 tests
 bash smoke_test_v040.sh                                            # 55-check release harness
-bash r2_regression_test.sh                                         # 57-check regression harness
+bash r2_regression_test.sh                                         # regression harness (external-review tests)
 ```
 
 The test suite pins golden counts to the published data release; the harnesses validate every gallery example, export format, and error path.
@@ -531,7 +530,7 @@ The test suite pins golden counts to the published data release; the harnesses v
 
 If you use SAURUS-CLI in your research, please cite:
 
-> Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in *Staphylococcus aureus*. *BMC Bioinformatics*. 2026 (under review). Software: doi:10.5281/zenodo.24084554
+> Beckley B. SAURUS-CLI: a reproducible command-line interface for typing-based genome retrieval in *Staphylococcus aureus*. *BMC Bioinformatics*. 2026 (under review). Software: doi:10.5281/zenodo.24599839
 
 The data release:
 
