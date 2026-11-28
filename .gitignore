@@ -56,3 +56,4 @@ data/
 
 # Data bundles ship via argus-data releases, not git
 data/
+*.bak

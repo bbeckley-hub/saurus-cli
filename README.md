@@ -30,7 +30,7 @@ All three read the same data and return the same numbers. Pick the tool that mat
 
 ## What's new in v0.4.0
 
-- **Corrected data release v1.1.0** — repairs the truncated virulence table shipped in data v1.0.0 (an Excel row-cap defect): the VFDB layer now covers 1,136,550 annotation rows over 98,948 annotated genomes (was 13,978). Gene-query results change accordingly: `--vfdb lukS-PV` returns 14,856 master-table genomes (was 558)
+- **Corrected data release v1.1.0** — repairs the truncated virulence table shipped in data v1.0.0 (an Excel row-cap defect): the VFDB layer now covers 1,136,551 annotation rows over 98,948 annotated genomes (was 13,978). Gene-query results change accordingly: `--vfdb lukS-PV` returns 14,856 master-table genomes (was 558)
 - **Data releases resolved from the standalone [argus-data](https://github.com/bbeckley-hub/argus-data) repository** — `saurus init` resolves the newest `saurus-data-*` tag, so code and data versioning are fully decoupled; `saurus init -v v1.1.0` pins a specific release
 - **Checksum enforcement for offline installs** — `saurus init --from-file` now refuses to install when the `.sha256` sidecar is missing or fails; `--allow-unverified` is the explicit opt-out, and a checksum mismatch is always fatal
 - **Loud failures instead of silent wrong answers** — an unknown gene under `--any` aborts with exit code 1 (was: returned all 134,273 rows); unknown config keys are fatal; `--country` uses exact matching (Oman no longer matches Romania)
@@ -448,16 +448,11 @@ Zero duplication. If the admin updates the shared copy, all users pick up the ch
 
 If you clone the repository and install in editable mode (`pip install -e .`), the CLI reads from `./data/`. The distributed package bundles this directory under `share/saurus/data/`. The versioned data bundle itself is published in the [argus-data](https://github.com/bbeckley-hub/argus-data) repository, not in this code repository.
 
-The pipeline that produced every table behind the web resource - the HPC
-typing lane, batch checkpoints, merge and curation scripts, and all site
-generators - is maintained in the
-[argus-code](https://github.com/bbeckley-hub/argus-code) repository
-(subdirectory `saurus/`). It ships the full checkpoint state gzipped:
-restore with `scripts/restore_seeds.sh`, then `Regenerate_all.sh`
-reproduces the live site; new genomes enter through the documented HPC
-lane into `batches/`. See `saurus/README.md` for the two-lane workflow
-and the verified checkpoint numbers. The gene-annotation layer derives
-from the static Shelenkov et al. (2025) tables and is never regenerated.
+>The versioned data bundle itself is published in the argus-data repository, not in this code repository.
+
+The pipeline that produced every table behind the web resource — the HPC typing lane, batch checkpoints, merge and curation scripts, and all sitegenerators — is maintained in the
+[argus-code](https://github.com/bbeckley-hub/argus-code) repository(subdirectory `saurus/`). It ships the full checkpoint state gzipped: restore with `scripts/restore_seeds.sh`, then `Regenerate_all.sh` reproduces the live site; new genomes enter 
+through the documented HPC lane into `batches/`. See `saurus/README.md` for the two-lane workflow and the verified checkpoint numbers. The gene-annotation layer derives from the static Shelenkov et al. (2025) tables and is never regenerated.
 
 ```
 data/
@@ -560,8 +555,8 @@ SAURUS-CLI is the second release in the ARGUS initiative, a family of open genom
 - SAURUS web resource: https://saurus-db.org/
 - Full CLI manual: https://saurus-db.org/manual.html
 - Data releases: https://github.com/bbeckley-hub/argus-data (tag prefix `saurus-data-`)
-- Web & data pipeline source (full reproducibility): https://github.com/bbeckley-hub/argus-code (`saurus/` - HPC lane, batch checkpoints, site generators)
 - Pandas access via fsspec: https://github.com/bbeckley-hub/saurus-fsspec
+- Web & data pipeline source (full reproducibility): https://github.com/bbeckley-hub/argus-code (`saurus/` — HPC lane, batch checkpoints, site generators)
 
 ---
 
